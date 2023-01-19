@@ -14,3 +14,6 @@ Ja silloin pilvipalvelussa voisi olla vaikka näin:
 MYSQL_SERVER = "mysql://netuser:netpass@mysqlserver.firma.com:3306/library"
 PORT=5000
 </pre>
+
+## branch database_auth
+Tässä branchissä autentikointi tapahtuu http-basicillä, jossa tunnus ja salana kelpaa, jos ne ovat tietokannan user_table taulussa.
