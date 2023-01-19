@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const user = require('../models/user_model');
+const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
 
 router.post('/',
     function (request, response) {
@@ -18,7 +20,8 @@ router.post('/',
                         bcrypt.compare(clear_password, hashed_password, function (err, compareResult) {
                             if (compareResult) {
                                 console.log("succes");
-                                response.send(true);
+                                const token = generateAccessToken({ username: user });
+                                response.send(token);
                             }
                             else {
                                 console.log("wrong password");
@@ -42,4 +45,8 @@ router.post('/',
     }
 );
 
+function generateAccessToken(username) {
+    dotenv.config();
+    return jwt.sign(username, process.env.MY_TOKEN, { expiresIn: '1800s' });
+  }
 module.exports = router;

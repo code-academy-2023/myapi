@@ -7,6 +7,7 @@ const cors=require('cors');
 const db = require('./database');
 const bcrypt = require('bcryptjs');
 const basicAuth = require('express-basic-auth');
+const jwt = require('jsonwebtoken');
 
 var indexRouter = require('./routes/index');
 var bookRouter = require('./routes/book');
@@ -29,42 +30,27 @@ app.use('/', indexRouter);
 app.use('/login', loginRouter);
 
 //suojatut endpointit
-//app.use(basicAuth({users: { 'admin': '1234' }}))
-app.use(basicAuth( { authorizer: myAuthorizer, authorizeAsync:true, } ))
+app.use(authenticateToken);
 app.use('/book', bookRouter);
 app.use('/borrower', borrowerRouter);
 app.use('/user', userRouter);
 
 
-function myAuthorizer(username, password,cb){
-    db.query('SELECT password FROM user_table WHERE username = ?',[username], 
-      function(dbError, dbResults, fields) {
-        if(dbError){
-              response.json(dbError);
-            }
-        else {
-          if (dbResults.length > 0) {
-            bcrypt.compare(password,dbResults[0].password, 
-              function(err,res) {
-                if(res) {
-                  console.log("succes");
-                  return cb(null, true);
-                }
-                else {
-                  console.log("wrong password");
-                  return cb(null, false);
-                }			
-                response.end();
-              }
-            );
-          }
-          else{
-            console.log("user does not exists");
-            return cb(null, false);
-          }
-        }
-      }
-    );
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+  
+    console.log("token = "+token);
+    if (token == null) return res.sendStatus(401)
+  
+    jwt.verify(token, process.env.MY_TOKEN, (err, user) => {
+      console.log(err)
+  
+      if (err) return res.sendStatus(403)
+  
+      req.user = user
+  
+      next()
+    })
   }
-
 module.exports = app;
