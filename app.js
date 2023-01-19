@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var bookRouter = require('./routes/book');
 var borrowerRouter = require('./routes/borrower');
 var userRouter = require('./routes/user');
+var loginRouter = require('./routes/login');
 
 var app = express();
 app.use(cors());
@@ -26,5 +27,6 @@ app.use(basicAuth({users: { 'admin': '1234' }}))
 app.use('/book', bookRouter);
 app.use('/borrower', borrowerRouter);
 app.use('/user', userRouter);
+app.use('/login', loginRouter);
 
 module.exports = app;
